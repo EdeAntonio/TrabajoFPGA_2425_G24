@@ -31,30 +31,30 @@ entity Gestor is
 end Gestor;
 --decision code 00 nada 01 puerta 10 abajo 11 arriba
 architecture Behavioral of Gestor is
-type secuence is array (0 to 3) of integer;
-constant serieum: secuence := (-1,1,-2,2);
+type secuence is array (0 to 4) of integer;
+constant serieum: secuence := (0,-1,1,-2,2);
 begin
-    p1: process(move, pos, pet)
-    variable i: integer := 0;
+    p1: process (pos, move, pet)
     variable place: integer := 0;
     variable flagPet: boolean := false;
     begin
-    while flagPet = false loop
-    
+    flagPet := false;
+    for i in 0 to 4 loop
+        exit when flagPet = true;
         if move="10" then --Tratamiento cuando el ascensor sube
             place := i + TO_INTEGER(unsigned(pos)); --Calculo posicion a comparar
             if place > 3 then --Corrección overflow
-                place := to_integer(unsigned(pos)) - i;
+                place := to_integer(unsigned(pos)) - (i - 3 + to_integer(unsigned(pos)));
             end if;
             if pet(place)='1' then
                 flagPet := true;
-                if i = 0 then
-                    decision <= "01";
-                end if;
                 if i <= (3 - to_integer(unsigned(pos))) then
                     decision <= "11";
                 end if;
                 if i > (3 - to_integer(unsigned(pos))) then 
+                    decision <= "10";
+                end if;
+                if i = 0 then
                     decision <= "01";
                 end if;
             end if;
@@ -69,17 +69,17 @@ begin
         if move="01" then --Tratamiento cuando el ascensor baja
             place := TO_INTEGER(unsigned(pos)) - i; -- Calculo posición
             if place < 0 then -- Tratamiento overflow
-                place := i + to_integer(unsigned(pos));
+                place := i;
             end if;
             if pet(place)='1' then --Detecta petición
                 flagPet := true;
-                if i = 0 then
-                    decision <= "01";
-                end if;
                 if i > to_integer(unsigned(pos)) then
-                    decision <= "10";
+                    decision <= "11";
                 end if;
                 if i <= to_integer(unsigned(pos)) then 
+                    decision <= "10";
+                end if;
+                if i = 0 then
                     decision <= "01";
                 end if;
             end if;
@@ -92,25 +92,24 @@ begin
         end if;
         
         if move="00" then --Tratamiento cuando esta parado.
-            place := i + serieum(i);
+            place := TO_INTEGER(unsigned(pos)) + serieum(i);
             if place > 3 or place < 0 then
                 if i=4 and flagPet = false then
-                    decision <= "00";
+                    decision <= "00"; 
                     flagPet := true;
                 end if;
-                i:= i + 1;
                 next;
             end if;
             if pet(place)='1' then
                 flagPet := true;
-                if i = 0 then
-                    decision <= "01";
-                end if;
                 if place > to_integer(unsigned(pos)) then
                     decision <= "11";
                 end if;
                 if place < to_integer(unsigned(pos)) then 
                     decision <= "10";
+                end if;
+                if i = 0 then
+                    decision <= "01";
                 end if;
             end if;
             if i=4 then 
@@ -120,7 +119,6 @@ begin
                 end if;
             end if;     
         end if;
-        i := i + 1;
     end loop;
     end process;
 end Behavioral;

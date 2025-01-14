@@ -31,42 +31,26 @@ entity Petition is
 end Petition;
 
 architecture Behavioral of Petition is
-
+    signal outsig: std_logic_vector(3 downto 0) := "0000";
 begin
-    p0: process(inpet(1))
+    p0: process(inpet, rm)
     begin
+        if inpet(0) = '1' then
+            outsig(0) <= '1';
+        end if;
         if inpet(1) = '1' then
-            outpet(1) <= '1';
+            outsig(1) <= '1';
         end if;
-    end process;
-    
-    p1: process(inpet(2))
-    begin
         if inpet(2) = '1' then
-            outpet(2) <= '1';
+            outsig(2) <= '1';
         end if;
-    end process;
-    
-     p2: process(inpet(2))
-    begin
-        if inpet(2) = '1' then
-            outpet(2) <= '1';
-        end if;
-    end process;
-    
-    p3: process(inpet(2))
-    begin
         if inpet(3) = '1' then
-            outpet(3) <= '1';
+            outsig(3) <= '1';
         end if;
-    end process;
-    
-    remove: process(rm)
-    begin
         if rm = '1' then
-            outpet(to_integer(unsigned(pos))) <= '0';
+            outsig(to_integer(unsigned(pos))) <= '0';
         end if;
     end process;
-
+    outpet <= outsig;
 end Behavioral;
 
