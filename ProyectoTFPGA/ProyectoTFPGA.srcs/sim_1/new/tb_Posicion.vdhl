@@ -1,0 +1,86 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity tb_Position is
+end tb_Position;
+
+architecture tb of tb_Position is
+
+    component Position
+        generic(
+            timelimit: integer
+            );
+        port (
+            move     : in std_logic_vector (1 downto 0);
+            clk      : in std_logic;
+            pos : out std_logic_vector (1 downto 0);
+            t1       : out std_logic
+        );
+    end component;
+
+    signal move     : std_logic_vector (1 downto 0):= "00";
+    signal clk      : std_logic := '0';
+    signal pos : std_logic_vector (1 downto 0) := "00";
+    signal t1       : std_logic := '0';
+
+    constant TbPeriod : time := 5 ns; -- EDIT Put right period here
+    signal TbClock : std_logic := '0';
+    
+    type vtest is record
+        movesim: std_logic_vector (1 downto 0);
+        possim: std_logic_vector (1 downto 0);
+    end record;
+    
+    type vtest_vector is array (natural RANGE <>) of vtest;
+    
+    constant test: vtest_vector := (
+        (movesim => "00", possim => "00"),
+        (movesim => "10", possim => "01"),
+        (movesim => "10", possim => "10"),
+        (movesim => "10", possim => "11"),
+        (movesim => "10", possim => "11"),
+        (movesim => "00", possim => "11"),
+        (movesim => "01", possim => "10"),
+        (movesim => "00", possim => "10"),
+        (movesim => "01", possim => "01"),
+        (movesim => "00", possim => "01"),
+        (movesim => "11", possim => "01")
+        );
+begin
+
+    dut : Position
+    generic map(
+        timelimit => 1
+    )
+    port map (
+            move => move,
+            clk  => clk,
+            pos  => pos,
+            t1   => t1
+    );
+
+    -- Clock generation
+    TbClock <= not TbClock after TbPeriod/2;
+
+    
+    clk <= TbClock;
+
+    stimuli : process
+    begin
+        for i in 0 to test'HIGH loop
+            move <= test(i).movesim;
+            wait until t1 = '1';
+            wait for 7.5ns;
+            assert t1 = '0'
+                report "Mala sincronización"
+                severity error;
+            assert pos = test(i).possim
+                report "Error transición"
+                severity Failure;
+        end loop;
+            assert false
+                report ("Fin prueba")
+                severity failure;
+    end process;
+
+end tb;
