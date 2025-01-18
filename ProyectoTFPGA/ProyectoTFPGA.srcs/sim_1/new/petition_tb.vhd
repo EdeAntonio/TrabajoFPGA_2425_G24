@@ -29,12 +29,14 @@ architecture tb of tb_Petition is
         port (inpet  : in std_logic_vector (3 downto 0);
               rm     : in std_logic;
               pos    : in std_logic_vector (1 downto 0);
+              reset: in std_logic;
               outpet : out std_logic_vector (3 downto 0));
     end component;
 
     signal inpet  : std_logic_vector (3 downto 0);
     signal rm     : std_logic;
     signal pos    : std_logic_vector (1 downto 0);
+    signal reset  : std_logic := '1';
     signal outpet : std_logic_vector (3 downto 0);
 
     type vtest is record
@@ -51,7 +53,7 @@ architecture tb of tb_Petition is
         (insim => "0000", rmsim => '0', possim => "10", outsim => "1000"), 
         (insim => "0010", rmsim => '1', possim => "11", outsim => "0010"),
         (insim => "0000", rmsim => '0', possim => "01", outsim => "0010"),
-        (insim => "0000", rmsim => '1', possim => "01", outsim => "0000")
+        (insim => "1100", rmsim => '1', possim => "01", outsim => "1100")
     );
 begin
 
@@ -59,6 +61,7 @@ begin
     port map (inpet  => inpet,
               rm     => rm,
               pos    => pos,
+              reset => reset,
               outpet => outpet);
 
     stimuli : process
@@ -71,8 +74,14 @@ begin
             wait for 20ns;
             assert test(i).outsim=outpet
                 report "Error en simulación"
-                severity error;
+                severity failure;
         end loop;
+        reset <= '0';
+        wait for 20 ns;
+        reset <= '1';
+        assert outpet = "0000"
+            report "Error reseteo"
+            severity Failure;
         assert false
             report "Fin Simulación"
             severity FAILURE;

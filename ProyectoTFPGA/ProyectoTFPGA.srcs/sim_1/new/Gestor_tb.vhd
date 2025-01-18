@@ -65,8 +65,10 @@ architecture tb of tb_Gestor is
         (petsim => "0010", possim => "01", movesim => "01", decisim => "01"),
         (petsim => "0100", possim => "10", movesim => "10", decisim => "01"),
         (petsim => "1000", possim => "11", movesim => "01", decisim => "01"),
-        (petsim => "0001", possim => "00", movesim => "10", decisim => "01")
+        (petsim => "0001", possim => "00", movesim => "10", decisim => "01"),
         --si esta en la posición abre la puerta sin importar lo que pase
+        (petsim => "1000", possim => "00", movesim => "00", decisim => "11")
+        --alcance máximo de la serie.
     );
 begin
 
@@ -87,7 +89,7 @@ begin
             wait for 10ns;
             assert decision = test(i).decisim
                 report "Fallo en el test"
-                severity error;
+                severity Failure;
             wait for 10ns;    
         end loop;   
         assert false
