@@ -6,30 +6,31 @@ entity Position is
         timelimit: integer := 10**8 --frecuencia del reloj para que tarde 2 segundos en actualizar
         );
     port(
-        move : in std_logic_vector(1 downto 0);
-        clk : in std_logic;
-        pos : out std_logic_vector(1 downto 0);
-        t1: out std_logic
+        move : in std_logic_vector(1 downto 0);     -- Entrada que define la dirección del movimiento
+        clk : in std_logic;                        -- Señal de reloj
+        pos : out std_logic_vector(1 downto 0);    -- Salida que representa la posición actual
+        t1: out std_logic                            -- Señal de control para indicar actualización
+    );
         );
 end Position;
 
 architecture Behavioral of Position is
-    signal tup : std_logic := '0';
-    type state is (P0, P1, P2, P3);
-    signal currentpos, nextpos : state := P0;
+    signal tup : std_logic := '0';                -- Señal interna para el temporizador de actualización
+    type state is (P0, P1, P2, P3);                -- Tipo enumerado para representar los estados
+    signal currentpos, nextpos : state := P0;    -- Señales internas para el estado actual y el siguiente
 begin
-    t1 <= tup;
-    timecounter: process(clk)
-        variable timecount : integer := 0;
+    t1 <= tup;                                    -- Asignación de la señal interna `tup` a la salida `t1`
+    timecounter: process(clk)                     -- Proceso encargado de contar los ciclos de reloj para generar la señal `tup`
+        variable timecount : integer := 0;        -- Variable interna para contar el tiempo
     begin
-        if rising_edge(clk) then
-            timecount := timecount + 1;
-            if timecount = timelimit then
-                tup <= '0';
+        if rising_edge(clk) then                -- Se ejecuta en el flanco de subida del reloj
+            timecount := timecount + 1;           -- Incrementa el contador de tiempo
+            if timecount = timelimit then        
+                tup <= '0';                        -- Señal `tup` en bajo después del primer intervalo
             end if;
             if timecount = 2*timelimit then
-                timecount := 0;
-                tup <= '1';
+                timecount := 0;                    -- Reinicia el contador después de 2 intervalos
+                tup <= '1';                        -- Señal `tup` en alto para indicar actualización
             end if;
         end if;
     end process;
