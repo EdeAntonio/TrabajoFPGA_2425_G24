@@ -8,9 +8,9 @@ entity Position is
     port(
         move : in std_logic_vector(1 downto 0);     -- Entrada que define la dirección del movimiento
         clk : in std_logic;                        -- Señal de reloj
-        pos : out std_logic_vector(1 downto 0);    -- Salida que representa la posición actual
-        t1: out std_logic                            -- Señal de control para indicar actualización
-    );
+        reset: in std_logic;                       -- Señal de reseteo
+        pos : out std_logic_vector(1 downto 0)     -- Salida que representa la posición actual
+    )
         );
 end Position;
 
@@ -35,10 +35,13 @@ begin
         end if;
     end process;
     
-    stateregister: process(tup)                     -- Proceso para actualizar el estado actual según la señal `tup`
+    stateregister: process(tup,reset)                     -- Proceso para actualizar el estado actual según la señal `tup`
     begin
-        if tup = '1' then                           -- Sólo actualiza el estado cuando `tup` está en 1
-            currentpos <= nextpos;                   -- Se avanza la posición actual a la siguiente
+         if rising_edge(tup) then                         -- Sincronizamos con la señal temporizada
+            currentpos <= nextpos;
+        end if;
+        if reset = '0' then                             --Se añade reset y vuelve a la posicion 0 (inicial)
+            currentpos <= P0;
         end if;
     end process;
     
