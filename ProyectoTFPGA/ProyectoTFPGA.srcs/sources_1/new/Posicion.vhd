@@ -10,7 +10,6 @@ entity Position is
         clk : in std_logic;                        -- Señal de reloj
         reset: in std_logic;                       -- Señal de reseteo
         pos : out std_logic_vector(1 downto 0)     -- Salida que representa la posición actual
-    )
         );
 end Position;
 
