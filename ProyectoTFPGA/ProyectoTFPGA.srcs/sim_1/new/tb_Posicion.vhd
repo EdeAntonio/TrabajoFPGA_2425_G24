@@ -13,16 +13,15 @@ architecture tb of tb_Position is
         port (
             move     : in std_logic_vector (1 downto 0);          -- Entrada para indicar acción de movimiento (00: quieto; 10: subir; 01: bajar)
             clk      : in std_logic;                              -- Señal de reloj
-            pos : out std_logic_vector (1 downto 0);              -- Salida que indica la planta actual
-            t1       : out std_logic                              -- Señal que marca la actualización del estado
-        );
+            reset    : in std_logic;                              -- Señal de reseteo
+            pos : out std_logic_vector (1 downto 0)              -- Salida que indica la planta actual
         );
     end component;
 
     signal move     : std_logic_vector (1 downto 0):= "00";        -- Señal de movimiento inicializada en "00" para que no se mueva
     signal clk      : std_logic := '0';                            -- Señal de reloj inicializada en '0'
     signal pos : std_logic_vector (1 downto 0) := "00";            -- Salida que almacena la posición se iniciliza en "00" para ubicarse en la planta baja
-    signal t1       : std_logic := '0';                            -- Señal de actualización inicializada en '0'
+    signal reset    : std_logic := '1';                            -- Se inicia el reseteo a 1 para reiniciar todo
 
     constant TbPeriod : time := 5 ns;                             -- Período del reloj de prueba
     signal TbClock : std_logic := '0';                            -- Señal interna para generar el reloj
@@ -57,7 +56,7 @@ begin
             move => move,                         -- Conexión de la señal de movimiento
             clk  => clk,                          -- Conexión de la señal de reloj
             pos  => pos,                          -- Conexión de la señal de posición
-            t1   => t1                            -- Conexión de la señal de actualización
+           reset => reset,                       -- Conexión de la señal de reset
     );
 
     -- Clock generation
@@ -68,15 +67,18 @@ begin
     begin
         for i in 0 to test'HIGH loop            -- Pasar por todos los casos de prueba definidos en `test`
             move <= test(i).movesim;            -- Aplicar el movimiento correspondiente
-            wait until t1 = '1';                -- Esperar a que la señal de actualización esté activa
-            wait for 7.5ns;                      -- Añadir un pequeño retraso para sincronización
-            assert t1 = '0'
-                report "Mala sincronización"    -- Comprobar que `t1` regresa a '0' tras la actualización
-                severity error;
+             wait for 2*tbperiod;
+
             assert pos = test(i).possim
                 report "Error transición"        -- Comprobar que la posición coincide con el valor esperado
                 severity failure;
         end loop;
+          reset <= '0';                          -- Se establece el reseteo como falso
+            wait for tbperiod;
+            assert pos = "00"
+                report "fallo reseteo"
+                severity failure;
+
             assert false
                 report ("Fin prueba")            -- Al finalizar todos los casos de prueba, generar un mensaje de fin
                 severity failure;
