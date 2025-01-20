@@ -170,7 +170,7 @@ begin
     Dec: Gestor port map(
         pet => outPet,
         pos => livePos,
-        move => stDeciOut,
+        move => motOut,
         decision => deciOut
         );
     MS: FMS 

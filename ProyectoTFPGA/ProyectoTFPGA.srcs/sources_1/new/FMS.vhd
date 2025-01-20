@@ -101,7 +101,7 @@ begin
         end case;
      end process;
     -- Proceso para activar la espera
-     acti_esp: process(cstate, counter)
+     acti_esp: process(cstate, reset)
      begin
         if reset = '0' then
             espactiva <= '0'; -- Desactiva la espera

@@ -17,8 +17,7 @@ architecture Behavioral of Position is
     signal tup : std_logic := '0';                -- Señal interna para el temporizador de actualización
     type state is (P0, P1, P2, P3);                -- Se representan los estados de las plantas (P0 = planta 0; P1 = planta 1; P2 = planta 2; P3 = planta 3)
     signal currentpos, nextpos : state := P0;    -- Señales internas para el estado actual y el siguiente
-begin
-    t1 <= tup;                                    -- Asignación de la señal interna `tup` a la salida `t1`
+begin       
     timecounter: process(clk)                     -- Proceso encargado de contar los ciclos de reloj para generar la señal `tup`
         variable timecount : integer := 0;        -- Variable interna para contar el tiempo
     begin

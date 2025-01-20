@@ -24,6 +24,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity Petition is
     Port ( 
         inpet : in std_logic_vector(3 downto 0); --Entrada sincronizada de las peticiones
+        clk : in std_logic;
         rm : in std_logic; --Señal para eliminar una peticion
         pos : in std_logic_vector (1 downto 0); --Posición donde se elimina la señal
         reset: in std_logic; --Señal de reseteo para reiniciar la entidad
@@ -34,8 +35,9 @@ end Petition;
 architecture Behavioral of Petition is
     signal outsig: std_logic_vector(3 downto 0) := "0000"; -- Señal intermedia que guarda las peticiones
 begin
-    p0: process(inpet, rm, reset)
+    p0: process(clk, reset)
     begin
+    if rising_edge(clk) then
         if inpet(0) = '1' then -- Guardar peticion en planta 0
             outsig(0) <= '1';
         end if;
@@ -51,6 +53,7 @@ begin
         if rm = '1' then -- Eliminar la petición en la posición correspondiente
             outsig(to_integer(unsigned(pos))) <= '0';
         end if;
+    end if;
         if reset = '0' then -- Resetear la señal
             outsig <= (others => '0');
         end if;
