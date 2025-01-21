@@ -35,6 +35,7 @@ entity TOP is
         upMot: out std_logic;
         downMot: out std_logic;
         puerta: out std_logic;
+        decision: out std_logic_vector(1 downto 0);
         peticion: out std_logic_vector(3 downto 0)
     );
 end TOP;
@@ -205,5 +206,6 @@ begin
     downMot <= motOut(0);
     puerta <= dorOut;
     peticion <= outPet;
+    decision <= deciOut;
 end Estructural;
 

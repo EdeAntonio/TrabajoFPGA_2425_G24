@@ -66,7 +66,7 @@ begin
                 end if;
             when GD =>
                 if decision = "10" then
-                    nstate <= GU; -- Cambia al estado GU
+                    nstate <= GD; -- Cambia al estado GU
                  else 
                     nstate <= ST; -- Cambia al estado ST
                 end if;
