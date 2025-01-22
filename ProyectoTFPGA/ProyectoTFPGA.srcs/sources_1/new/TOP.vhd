@@ -94,6 +94,15 @@ architecture Estructural of TOP is
         );
     end component;
     signal deciOut: std_logic_vector(1 downto 0);
+--Estabilizador de la realimentación de la decisión
+    component StableDeci 
+    port(
+        Decision: in std_logic_vector(1 downto 0);
+        clk: in std_logic;
+        StDeciOut: out std_logic_vector (1 downto 0)
+        );
+    end component;
+    signal stdeciout: std_logic_vector(1 downto 0);
 --Componente FMS del sensor y sus señales
     component FMS
         Generic(
@@ -171,8 +180,13 @@ begin
     Dec: Gestor port map(
         pet => outPet,
         pos => livePos,
-        move => motOut,
+        move => stdeciout,
         decision => deciOut
+        );
+    SD: StableDeci port map(
+        Decision => deciOut,
+        clk => clk,
+        StDeciOut => stdeciout
         );
     MS: FMS 
         generic map(
