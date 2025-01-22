@@ -54,7 +54,7 @@ begin
             if timecount = (timelimit/10**3) then
                 timecount := 0;                    -- Reinicia el contador después de 2 intervalos
                 tup <= '1';                        -- Señal `tup` en alto para indicar actualización
-                if count > 7 then
+                if count >= 7 then
                     count <= 0;
                 else
                     count <= count + 1;
